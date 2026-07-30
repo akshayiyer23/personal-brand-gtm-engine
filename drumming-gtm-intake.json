@@ -1,0 +1,250 @@
+{
+  "name": "drumming-gtm-intake",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "new-lead",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -608,
+        -16
+      ],
+      "id": "21a1bccd-c41c-4ccf-897d-8f407788bdd6",
+      "name": "Webhook",
+      "webhookId": "6b67d942-a2fe-4125-803e-efb92225d013"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "43deff0f-126b-457b-ab8c-2cfc3d198b80",
+              "name": "Company",
+              "value": "={{ $json.body.company }}",
+              "type": "string"
+            },
+            {
+              "id": "9e66db63-9810-42b6-bffc-76817ad598f7",
+              "name": "Domain",
+              "value": "={{ $json.body.domain }}",
+              "type": "string"
+            },
+            {
+              "id": "2e4a12e5-2d30-4578-ae31-3f6ad81e8b9c",
+              "name": "Contact",
+              "value": "={{ $json.body.contact }}",
+              "type": "string"
+            },
+            {
+              "id": "6aea2f07-41a5-42db-87f5-2786557722f4",
+              "name": "Title",
+              "value": "={{ $json.body.title }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -384,
+        -160
+      ],
+      "id": "f7def1d6-cf7f-474d-9627-e1f5fc203792",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "e6c9139d-30a1-40ae-9fbe-863678ab84bc",
+              "leftValue": "={{ $json.Domain }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -192,
+        0
+      ],
+      "id": "abd1b222-dd22-46d9-888c-bd9621ae9b49",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "emailFinder",
+        "domain": "={{ $json.Domain }}",
+        "firstname": "={{ $json.Contact.split(' ')[0] }}",
+        "lastname": "={{ $json.Contact.split(' ')[1] }}"
+      },
+      "type": "n8n-nodes-base.hunter",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        -192
+      ],
+      "id": "af8c7cf1-5500-4316-b7f8-903b5a325fcf",
+      "name": "Hunter",
+      "credentials": {
+        "hunterApi": {
+          "id": "A7qbRH43izV1EcIS",
+          "name": "Hunter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b67bbc6b-aa7d-4ffa-9199-99f114683d62",
+              "leftValue": "={{ $json.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        256,
+        -256
+      ],
+      "id": "da7af27d-467b-4e60-a0e6-5f907ee20b3e",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "email": "={{ $json.email }}",
+        "additionalFields": {
+          "companyName": "={{ $('Edit Fields').item.json.Company }}",
+          "firstName": "={{ $json.first_name }}",
+          "lastName": "={{ $json.last_name }}"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 2.2,
+      "position": [
+        480,
+        -304
+      ],
+      "id": "bee8e874-cf81-4263-a01d-2050a3e31495",
+      "name": "Create or update a contact",
+      "credentials": {
+        "hubspotOAuth2Api": {
+          "id": "OmyP2i2aqcek1xK1",
+          "name": "HubSpot account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Hunter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hunter": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Create or update a contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "c438d245-b174-489b-a73c-62160f106454",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5e33b73d744692a21614e44ba1f3f6cf71eab10a5508bbf482c847813e14bbc8"
+  },
+  "nodeGroups": [],
+  "id": "XO2UYVISC2JbWoiy",
+  "tags": []
+}
