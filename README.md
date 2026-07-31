@@ -2,6 +2,8 @@
 
 I run a session and touring drumming business. Over 60 days I closed 8 deals for $8,300 across sessions, touring, brand partnerships, and game scores. This is the GTM system I built to scale the one channel I couldn't leave to luck: cold outbound to game studios. It uses the same stack a startup GTM team runs on: Clay, n8n, and HubSpot.
 
+**▶ Watch the 2-minute walkthrough:** https://www.loom.com/share/6c065db7ee3e4e3bae648dbb2d9f57be
+
 ## The problem I was actually solving
 
 Here's my revenue by channel:
